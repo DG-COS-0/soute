@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-
+const requestRouter = require("./requestRoute");
 const userController = require("./../controllers/userController");
 const authController = require("./../controllers/authController");
 router.post("/signup", authController.signup);
@@ -25,5 +25,6 @@ router.patch(
 router.delete("/deleteMe", userController.deleteMe);
 
 router.route("/").get(userController.getAllMembers);
+router.use("/:senderId/requests", requestRouter);
 
 module.exports = router;

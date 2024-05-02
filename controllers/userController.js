@@ -107,7 +107,7 @@ exports.createMember = (req, res) => {
   });
 };
 
-exports.getUser = ressourceShorcut.getOneRessource(User);
+exports.getUser = ressourceShorcut.getOneRessource(User, { path: "requests" });
 exports.getAllMembers = ressourceShorcut.getAllRessources(User);
 exports.updateMember = ressourceShorcut.updateOneRessource(User);
 exports.deleteMember = ressourceShorcut.deleteOneRessource(User);

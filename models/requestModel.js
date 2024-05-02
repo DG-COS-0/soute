@@ -47,11 +47,44 @@ const requestSchema = new mongoose.Schema({
       messages: "Votre status de requete n'est pas pris en compte",
     },
   },
+  isActive: {
+    type: Boolean,
+    default: true,
+  },
 });
 
 requestSchema.pre("save", async function (next) {
   this.sender = await User.findById(this.sender);
+
   next();
+});
+requestSchema.pre("save", async function (next) {
+  await User.addRequest(this.sender, this._id);
+  next();
+});
+requestSchema.pre(/^find/, async function (next) {
+  this.find({ isActive: { $ne: false } });
+  next();
+});
+requestSchema.pre(/^find/, async function (next) {
+  this.populate([
+    {
+      path: "sender",
+      select: "surName firstNames photo email",
+    },
+    {
+      path: "childOfMme",
+      select: "surName firstNames photo email",
+    },
+    {
+      path: "childOfMr",
+      select: "surName firstNames photo email",
+    },
+    {
+      path: "family",
+      select: "name",
+    },
+  ]);
 });
 requestSchema.methods.confirmRequest = async function () {
   console.log(this.family);

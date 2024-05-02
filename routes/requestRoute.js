@@ -11,6 +11,7 @@ router
     requestController.setUserId,
     requestController.createRequest
   );
+router.route("/:id").delete(requestController.deleteRequest);
 
 router.patch("/reply/:id", requestController.replyToRequests);
 module.exports = router;

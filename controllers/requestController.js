@@ -12,6 +12,7 @@ exports.setFamilyId = catchAsync(async (req, res, next) => {
   }
   next();
 });
+
 exports.setUserId = catchAsync(async (req, res, next) => {
   if (!req.body.sender) {
     req.body.sender = req.user._id;
@@ -44,4 +45,24 @@ exports.replyToRequests = catchAsync(async (req, res, next) => {
 });
 
 exports.getAllRequests = ressourceShortcut.getAllRessources(Request);
+exports.getOneRequest = ressourceShortcut.getOneRessource(Request, {
+  path: "sender",
+});
+exports.deleteRequest = catchAsync(async (req, res, next) => {
+  const deletedRequest = await Request.findByIdAndUpdate(
+    req.params.id,
+    {
+      isActive: false,
+    },
+    {
+      runValidators: true,
+      new: true,
+    }
+  );
+  console.log(deletedRequest);
+  res.status(204).json({
+    status: "success",
+    message: "Requetes supprimé avec succès",
+  });
+});
 exports.createRequest = ressourceShortcut.createOneRessource(Request);

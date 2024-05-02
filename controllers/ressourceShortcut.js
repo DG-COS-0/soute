@@ -65,13 +65,20 @@ exports.getOneRessource = (Ressource, popOptions) =>
     });
   });
 
-exports.getAllRessources = (Ressource) =>
+exports.getAllRessources = (Ressource, popOptions) =>
   catchAsync(async (req, res, next) => {
     let filter = {};
     if (req.params.familyId) filter = { family: req.params.familyId };
     if (req.params.photoAlbumId) filter = { album: req.params.photoAlbumId };
+    if (req.params.senderId)
+      filter = {
+        sender: req.params.senderId,
+      };
+    let query = Ressource.find(filter);
 
-    const features = new queryOperator(Ressource.find(filter), req.query)
+    if (popOptions) query = query.populate(popOptions);
+
+    const features = new queryOperator(query, req.query)
       .filter()
       .sort()
       .limitFields()

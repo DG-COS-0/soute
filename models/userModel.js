@@ -2,73 +2,94 @@ const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
 const crypto = require("crypto");
-const userSchema = new mongoose.Schema({
-  surName: {
-    type: String,
-  },
-  firstNames: {
-    type: String,
-  },
-  sexe: {
-    type: String,
-    enum: {
-      values: ["M", "F"],
-      message: "Veuillez utilisé l'une des possibilités M ou F",
+const userSchema = new mongoose.Schema(
+  {
+    surName: {
+      type: String,
     },
-    required: [true, "Veuillez entrer votres sexes"],
-  },
-  families: {
-    type: [mongoose.Schema.ObjectId],
-  },
-  photo: {
-    type: String,
-    default: "default-user.jpg",
-  },
-  role: {
-    type: String,
-    default: "user",
-    enum: {
-      values: ["user", "member", "dah", "admin"],
-      message: `Votre role n'est pas spécifié`,
+    firstNames: {
+      type: String,
     },
-  },
-  email: {
-    type: String,
-    validate: {
-      validator: validator.isEmail,
-      message: (props) => `${props.value} n'est pas une addresse mail valide`,
-    },
-    unique: true,
-  },
-  password: {
-    type: String,
-    required: [true, "Veuillez entrer votre mot de passe "],
-    select: false,
-  },
-  passwordConfirmation: {
-    type: String,
-    required: [true, "Veuillez confirmer votre mot de passe "],
-    validate: {
-      validator: function (passwordConfirmation) {
-        return this.password === passwordConfirmation;
+    sexe: {
+      type: String,
+      enum: {
+        values: ["M", "F"],
+        message: "Veuillez utilisé l'une des possibilités M ou F",
       },
-      message: `Les mots de passe que vous avez entré ne correspondent pas`,
+      required: [true, "Veuillez entrer votres sexes"],
     },
+    families: {
+      type: [mongoose.Schema.ObjectId],
+    },
+    photo: {
+      type: String,
+      default: "default-user.jpg",
+    },
+    role: {
+      type: String,
+      default: "user",
+      enum: {
+        values: ["user", "member", "dah", "admin"],
+        message: `Votre role n'est pas spécifié`,
+      },
+    },
+    email: {
+      type: String,
+      validate: {
+        validator: validator.isEmail,
+        message: (props) => `${props.value} n'est pas une addresse mail valide`,
+      },
+      unique: true,
+    },
+    password: {
+      type: String,
+      required: [true, "Veuillez entrer votre mot de passe "],
+      select: false,
+    },
+    passwordConfirmation: {
+      type: String,
+      required: [true, "Veuillez confirmer votre mot de passe "],
+      validate: {
+        validator: function (passwordConfirmation) {
+          return this.password === passwordConfirmation;
+        },
+        message: `Les mots de passe que vous avez entré ne correspondent pas`,
+      },
+    },
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
+    fatherFamilyPath: {
+      type: String,
+    },
+    motherFamilyPath: {
+      type: String,
+    },
+    passwordChangedAt: Date,
+    passwordResetToken: String,
+    passwordResetExpires: Date,
+    requests: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: "Request",
+      },
+    ],
   },
-  isActive: {
-    type: Boolean,
-    default: true,
-  },
-  fatherFamilyPath: {
-    type: String,
-  },
-  motherFamilyPath: {
-    type: String,
-  },
-  passwordChangedAt: Date,
-  passwordResetToken: String,
-  passwordResetExpires: Date,
-});
+  {
+    toJSON: {
+      virtuals: true,
+    },
+    toObject: {
+      virtuals: true,
+    },
+  }
+);
+// userSchema.virtual("requests", {
+//   ref: "Request",
+//   foreignField: "sender",
+//   localField: "_id",
+// });
 
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
@@ -96,6 +117,18 @@ userSchema.statics.addUserToFamily = async function (userId, familyId) {
     }
   );
 };
+userSchema.statics.addRequest = async function (userId, request) {
+  await User.findByIdAndUpdate(
+    userId,
+    {
+      $addToSet: { requests: request },
+    },
+    {
+      runValidators: true,
+    }
+  );
+};
+
 userSchema.methods.correctPassword = async function (
   candidatePassword,
   userPassword
