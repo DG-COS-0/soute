@@ -57,7 +57,7 @@ exports.getAllFamily = catchAsync(async (req, res, next) => {
 });
 exports.setDahId = catchAsync(async (req, res, next) => {
   if (!req.body.dah) {
-    req.body.dah = req.user.id;
+    req.body.dah = [req.user.id];
   }
 
   next();
@@ -66,8 +66,9 @@ exports.updateUserToDahRole = catchAsync(async (req, res, next) => {
   if (!req.user.id) {
     return next();
   }
+  console.log(req.body);
   await User.updateRole(req.user.id, "dah");
-  next();
+  await next();
 });
 
 exports.getOneFamily = catchAsync(async (req, res, next) => {
@@ -81,4 +82,13 @@ exports.getOneFamily = catchAsync(async (req, res, next) => {
     },
   });
 });
-exports.createFamily = ressourceShortcut.createOneRessource(Family);
+exports.createFamily = catchAsync(async (req, res, next) => {
+  const newFamily = await Family.create(req.body);
+  await User.addUserToFamily(req.body.dah, newFamily._id);
+  res.status(201).json({
+    status: "success",
+    data: {
+      data: newFamily,
+    },
+  });
+});

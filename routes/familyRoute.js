@@ -9,10 +9,10 @@ router
   .get(familyController.getAllFamily)
   .post(
     authController.protect,
-    familyController.setDahId,
     familyController.updateUserToDahRole,
     familyController.uploadFamilyImg,
     familyController.resizeFamilyImg,
+    familyController.setDahId,
     familyController.createFamily
   );
 router.route("/:id").get(familyController.getOneFamily);

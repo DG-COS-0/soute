@@ -96,6 +96,7 @@ requestSchema.methods.confirmRequest = async function () {
       this.expiredIn = undefined;
 
       await this.save({ validateBeforeSave: false });
+      console.log(this);
     })
     .catch((err) => {
       console.log(err);

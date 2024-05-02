@@ -37,6 +37,7 @@ exports.updateOneRessource = (Ressource) =>
 
 exports.createOneRessource = (Ressource) =>
   catchAsync(async (req, res, next) => {
+    console.log(req.body);
     const doc = await Ressource.create(req.body);
 
     res.status(201).json({

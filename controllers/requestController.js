@@ -32,10 +32,13 @@ exports.replyToRequests = catchAsync(async (req, res, next) => {
       )
     );
   }
+
   if (req.body.action === "accept") {
+    console.log("confirm");
     await request.confirmRequest();
   }
   if (req.body.action === "reject") {
+    console.log("deal");
     await request.rejectRequest();
   }
   res.status(200).json({

@@ -16,6 +16,7 @@ const familySchema = new mongoose.Schema(
       {
         type: mongoose.Schema.ObjectId,
         ref: "User",
+        required: [true, "Veuillez specifier un chef de famille"],
       },
     ],
     image: {
